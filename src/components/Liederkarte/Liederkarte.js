@@ -3,16 +3,23 @@ import "./Liederkarte.css"
 
 class Liederkarte extends React.Component  {
 
+  handleAuswahl(id){
+    this.props.auswahl(id)
+  }
 
   render() {
     return (
       <div className="col-sm-6">
         <div className="thumbnail">
-          <img src="..." alt="..."/>
+          <img src={this.props.lied.album.images[1].url} alt="Albumcover des aktuellen Lieds"/>
           <div className="caption">
-            <h3>Vorschaubild-Titel</h3>
-            <p>...</p>
-            <p><a href="#" className="btn btn-primary" role="button">Button</a> <a href="#" className="btn btn-default" role="button">Button</a></p>
+            <h3>{this.props.lied.name}</h3>
+            <p>{this.props.lied.artists[0].name}</p>
+            <p>{this.props.lied.album.name}</p>
+            <audio controls="" id="1_Audio" src={this.props.lied.preview_url}>
+              <source src="" type="audio/mpeg" />
+            </audio>
+            <button className="btn btn-primary" onClick={this.handleAuswahl.bind(this, this.props.id)}>dieses Lied auswählen</button>
           </div>
         </div>
       </div>
