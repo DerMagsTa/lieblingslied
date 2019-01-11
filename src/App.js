@@ -4,6 +4,7 @@ import './App.css';
 import Header from "./components/Header/Header.js"
 import Footer from "./components/Footer/Footer.js"
 import Liederkarte from "./components/Liederkarte/Liederkarte.js"
+import Siegerkarte from "./components/Siegerkarte/Siegerkarte.js"
 import SpotifyApi from "./util/SpotifyApi.js"
 
 
@@ -14,30 +15,39 @@ class App extends Component {
       lieder: [],
       lied1: {},
       lied2: {},
-      sieger: []
+      sieger: [],
+      entscheidungGetroffen: false
     }
     this.nächsteLieder = this.nächsteLieder.bind(this)
     this.liedAuswählen = this.liedAuswählen.bind(this)
+    this.nächsteRunde = this.nächsteRunde.bind(this)
+    this.reset = this.reset.bind(this)
   }
 
   componentWillMount(){
     SpotifyApi.ladeLieder().then(neueLieder =>{
       this.setState({
         lieder: neueLieder
+      }, () => {
+        this.nächsteLieder()
       })
-      this.nächsteLieder()
+      //this.nächsteLieder()
     })
   }
 
   nächsteLieder(){
     if(this.state.lieder.length > 0) {
-      let liedtemp1 = this.state.lieder[0].track
-      let liedtemp2 = this.state.lieder[1].track
-
+      console.log("nächste lieder fängt erfolgreich an")
+      console.log(this.state.lieder)
+      let liedtemp1 = this.state.lieder[0]
+      let liedtemp2 = this.state.lieder[1]
+      console.log(liedtemp1)
       this.setState({
         lieder: this.state.lieder.slice(2),
         lied1: liedtemp1,
         lied2: liedtemp2
+      }, () => {
+        console.log(this.state.lied1)
       })
     }
   }
@@ -46,22 +56,57 @@ class App extends Component {
     if(id===1){
       this.setState({
         sieger: [...this.state.sieger,this.state.lied1]
+      },() => {
+        if(this.state.lieder.length >= 2){
+          this.nächsteLieder()
+        } else{
+          this.nächsteRunde()
+        }
       })
     } else {
       this.setState({
         sieger: [...this.state.sieger,this.state.lied2]
+      },() => {
+        if(this.state.lieder.length >= 2){
+          this.nächsteLieder()
+        } else{
+          this.nächsteRunde()
+        }
       })
-    }
-    if(this.state.lieder.length >= 2){
-      this.nächsteLieder()
-    } else{
-      this.nächsteRunde()
     }
   }
 
   nächsteRunde(){
-    //TODO Sieger auf Lieder setzten
-    //TODO wenn Sieger.length === 1 -> Ende
+    console.log("nächste Runde")
+    if(this.state.sieger.length === 1) {
+      this.setState({
+        entscheidungGetroffen: true
+      })
+    } else {
+      console.log("State ändern auf sieger")
+      this.setState({
+        lieder: this.state.sieger,
+        sieger: []
+      }, ()=>{
+        console.log(this.state.lieder)
+        console.log("nächste lieder")
+        this.nächsteLieder()
+      })
+        
+    }
+  }
+
+  reset(){
+    SpotifyApi.ladeLieder().then(neueLieder =>{
+      this.setState({
+        lieder: neueLieder,
+        lied1: {},
+        lied2: {},
+        sieger: [],
+        entscheidungGetroffen: false
+      })
+      this.nächsteLieder()
+    })
   }
 
   render() {
@@ -76,9 +121,11 @@ class App extends Component {
           {/* Cardcontainer */}
           <div className="Row">
             {/* Card mit Lied 1 */}
-            <Liederkarte lied={this.state.lied1} id={1} auswahl={this.liedAuswählen}/>
+            {!this.state.entscheidungGetroffen ? <Liederkarte lied={this.state.lied1.track} id={1} auswahl={this.liedAuswählen}/> : null}
             {/* Card mit Lied 2 */}
-            <Liederkarte lied={this.state.lied2} id={2} auswahl={this.liedAuswählen}/>
+            {!this.state.entscheidungGetroffen ? <Liederkarte lied={this.state.lied2.track} id={2} auswahl={this.liedAuswählen}/> : null}
+            {/* Siegerkarte (wenn vorbei) */}
+            {this.state.entscheidungGetroffen ? <Siegerkarte lied={this.state.sieger[0].track} reset={this.reset}/> : null}
           </div>
 
           {/* Liste ausgewählter Lieder */}

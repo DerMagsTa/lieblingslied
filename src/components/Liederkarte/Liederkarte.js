@@ -8,7 +8,7 @@ class Liederkarte extends React.Component  {
   }
 
   render() {
-    if(typeof(this.props.lied.name)==="undefined") {
+    if(typeof(this.props.lied)==="undefined" || typeof(this.props.lied.name)==="undefined") {
       return (
         <div className="col-sm-6">
         <div className="thumbnail">
