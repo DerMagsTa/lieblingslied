@@ -1,15 +1,19 @@
 
 const SpotifyApi = {
-
-  ladeLieder() {
-    let lieder = json.items.slice()
-    return lieder
+  ladeLieder: function() {
+    return import("./lieder.json").then(resolveValue =>{
+      return resolveValue
+    }).then(jsonResponse => {
+      if(jsonResponse.items) {
+        return jsonResponse.items
+      }
+    })
   }
 
 }
 
 export default SpotifyApi
-
+/*
 const json = {
   "href" : "https://api.spotify.com/v1/me/tracks?offset=0&limit=20&market=ES",
   "items" : [ {
@@ -1357,3 +1361,4 @@ const json = {
   "previous" : null,
   "total" : 278
 }
+*/

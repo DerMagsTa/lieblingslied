@@ -11,7 +11,7 @@ class App extends Component {
   constructor(props){
     super(props)
     this.state = {
-      lieder: SpotifyApi.ladeLieder(),
+      lieder: [],
       lied1: {},
       lied2: {},
       sieger: []
@@ -21,26 +21,25 @@ class App extends Component {
   }
 
   componentWillMount(){
-    /*
-    let neueLieder = SpotifyApi.ladeLieder()
-    this.setState({
-      lieder: neueLieder.slice()
+    SpotifyApi.ladeLieder().then(neueLieder =>{
+      this.setState({
+        lieder: neueLieder
+      })
+      this.nächsteLieder()
     })
-    */
-    console.log(this.state.lieder)
-    this.nächsteLieder()
   }
 
   nächsteLieder(){
-    let liedtemp1 = this.state.lieder[0].track
-    console.log(liedtemp1)
-    let liedtemp2 = this.state.lieder[1].track
+    if(this.state.lieder.length > 0) {
+      let liedtemp1 = this.state.lieder[0].track
+      let liedtemp2 = this.state.lieder[1].track
 
-    this.setState({
-      lieder: this.state.lieder.slice(2),
-      lied1: liedtemp1,
-      lied2: liedtemp2
-    })
+      this.setState({
+        lieder: this.state.lieder.slice(2),
+        lied1: liedtemp1,
+        lied2: liedtemp2
+      })
+    }
   }
 
   liedAuswählen(id){

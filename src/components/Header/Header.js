@@ -6,7 +6,7 @@ class Header extends React.Component  {
 
   render() {
     return (
-      <header>
+      <header id="home">
         <nav className="navbar navbar-default navbar-fixed-top">
           <div className="container">
             <div className="navbar-header">
@@ -16,12 +16,12 @@ class Header extends React.Component  {
                 <span className="icon-bar"></span>
                 <span className="icon-bar"></span>
               </button>
-              <a className="navbar-brand" href="#">Projekt-Titel</a>
+              <a className="navbar-brand" href="#home">Projekt-Titel</a>
             </div>
 
             <div id="navbar" className="collapse navbar-collapse">
               <ul className="nav navbar-nav">
-                <li className="active"><a href="#">Start</a></li>
+                <li className="active"><a href="#home">Start</a></li>
                 <li><a href="#ueber">Über</a></li>
                 <li><a href="#kontakt">Kontakt</a></li>
               </ul>
