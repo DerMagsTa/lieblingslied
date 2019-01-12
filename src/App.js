@@ -5,6 +5,7 @@ import Header from "./components/Header/Header.js"
 import Footer from "./components/Footer/Footer.js"
 import Liederkarte from "./components/Liederkarte/Liederkarte.js"
 import Siegerkarte from "./components/Siegerkarte/Siegerkarte.js"
+import Login from "./components/Login/Login.js"
 import SpotifyApi from "./util/SpotifyApi.js"
 
 
@@ -16,38 +17,40 @@ class App extends Component {
       lied1: {},
       lied2: {},
       sieger: [],
-      entscheidungGetroffen: false
+      entscheidungGetroffen: false,
+      loggtin: false
     }
     this.nächsteLieder = this.nächsteLieder.bind(this)
     this.liedAuswählen = this.liedAuswählen.bind(this)
     this.nächsteRunde = this.nächsteRunde.bind(this)
+    this.loginFunc = this.loginFunc.bind(this)
     this.reset = this.reset.bind(this)
   }
 
-  componentWillMount(){
-    SpotifyApi.ladeLieder().then(neueLieder =>{
-      this.setState({
-        lieder: neueLieder
-      }, () => {
-        this.nächsteLieder()
+  componentDidMount(){
+    const urlParams = new URLSearchParams(window.location.search)
+    const accessToken = urlParams.get('access_token')
+    if(accessToken) {
+      SpotifyApi.ladeLieder(accessToken).then(neueLieder =>{
+        this.setState({
+          lieder: neueLieder,
+          loggtin: true
+        }, () => {
+          this.nächsteLieder()
+        })
       })
-      //this.nächsteLieder()
-    })
+    } 
+    
   }
 
   nächsteLieder(){
     if(this.state.lieder.length > 0) {
-      console.log("nächste lieder fängt erfolgreich an")
-      console.log(this.state.lieder)
       let liedtemp1 = this.state.lieder[0]
       let liedtemp2 = this.state.lieder[1]
-      console.log(liedtemp1)
       this.setState({
         lieder: this.state.lieder.slice(2),
         lied1: liedtemp1,
         lied2: liedtemp2
-      }, () => {
-        console.log(this.state.lied1)
       })
     }
   }
@@ -83,13 +86,11 @@ class App extends Component {
         entscheidungGetroffen: true
       })
     } else {
-      console.log("State ändern auf sieger")
+
       this.setState({
         lieder: this.state.sieger,
         sieger: []
       }, ()=>{
-        console.log(this.state.lieder)
-        console.log("nächste lieder")
         this.nächsteLieder()
       })
         
@@ -97,7 +98,9 @@ class App extends Component {
   }
 
   reset(){
-    SpotifyApi.ladeLieder().then(neueLieder =>{
+    const urlParams = new URLSearchParams(window.location.search)
+    const accessToken = urlParams.get('access_token')
+    SpotifyApi.ladeLieder(accessToken).then(neueLieder =>{
       this.setState({
         lieder: neueLieder,
         lied1: {},
@@ -109,6 +112,12 @@ class App extends Component {
     })
   }
 
+  loginFunc(){
+    console.log("login")
+    window.location = "http://localhost:8888/login"
+   
+  }
+
   render() {
     return (
       <div className="App">
@@ -117,16 +126,23 @@ class App extends Component {
         <div className="container AppContainer">
           {/* Überschrift */}
           {/* Erklärung */}
+
+          {!this.state.loggtin 
+            ? <Login loginFunc={this.loginFunc}/>
+            : <div className="Row">
+              {/* Card mit Lied 1 */}
+              {!this.state.entscheidungGetroffen ? <Liederkarte lied={this.state.lied1.track} id={1} auswahl={this.liedAuswählen}/> : null}
+              {/* Card mit Lied 2 */}
+              {!this.state.entscheidungGetroffen ? <Liederkarte lied={this.state.lied2.track} id={2} auswahl={this.liedAuswählen}/> : null}
+              {/* Siegerkarte (wenn vorbei) */}
+              {this.state.entscheidungGetroffen  ? <Siegerkarte lied={this.state.sieger[0].track} reset={this.reset}/> : null}
+            </div>         
             
+          }
+
           {/* Cardcontainer */}
-          <div className="Row">
-            {/* Card mit Lied 1 */}
-            {!this.state.entscheidungGetroffen ? <Liederkarte lied={this.state.lied1.track} id={1} auswahl={this.liedAuswählen}/> : null}
-            {/* Card mit Lied 2 */}
-            {!this.state.entscheidungGetroffen ? <Liederkarte lied={this.state.lied2.track} id={2} auswahl={this.liedAuswählen}/> : null}
-            {/* Siegerkarte (wenn vorbei) */}
-            {this.state.entscheidungGetroffen ? <Siegerkarte lied={this.state.sieger[0].track} reset={this.reset}/> : null}
-          </div>
+          
+            
 
           {/* Liste ausgewählter Lieder */}
 
