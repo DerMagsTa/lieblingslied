@@ -5,6 +5,7 @@ import Header from "./components/Header/Header.js"
 import Footer from "./components/Footer/Footer.js"
 import Liederkarte from "./components/Liederkarte/Liederkarte.js"
 import Siegerkarte from "./components/Siegerkarte/Siegerkarte.js"
+import Siegerliste from "./components/Siegerliste/Siegerliste.js"
 import Login from "./components/Login/Login.js"
 import SpotifyApi from "./util/SpotifyApi.js"
 
@@ -18,7 +19,9 @@ class App extends Component {
       lied2: {},
       sieger: [],
       entscheidungGetroffen: false,
-      loggtin: false
+      loggtin: false,
+      runde: 1,
+      anzahlLiederInRunde: 20
     }
     this.nächsteLieder = this.nächsteLieder.bind(this)
     this.liedAuswählen = this.liedAuswählen.bind(this)
@@ -89,7 +92,9 @@ class App extends Component {
 
       this.setState({
         lieder: this.state.sieger,
-        sieger: []
+        sieger: [],
+        runde: this.state.runde+1,
+        anzahlLiederInRunde: this.state.sieger.length 
       }, ()=>{
         this.nächsteLieder()
       })
@@ -106,7 +111,9 @@ class App extends Component {
         lied1: {},
         lied2: {},
         sieger: [],
-        entscheidungGetroffen: false
+        entscheidungGetroffen: false,
+        runde: 1,
+        anzahlLiederInRunde: 20
       })
       this.nächsteLieder()
     })
@@ -125,19 +132,26 @@ class App extends Component {
         
         <div className="container AppContainer">
           {/* Überschrift */}
+          <h1 className="überschrift">Was ist dein Lieblingslied?</h1>
           {/* Erklärung */}
-
+          <h3 className="erklärung" >einfach jeweils das Lied auswählen, welches dir besser gefällt.</h3>
           {!this.state.loggtin 
             ? <Login loginFunc={this.loginFunc}/>
-            : <div className="Row">
-              {/* Card mit Lied 1 */}
-              {!this.state.entscheidungGetroffen ? <Liederkarte lied={this.state.lied1.track} id={1} auswahl={this.liedAuswählen}/> : null}
-              {/* Card mit Lied 2 */}
-              {!this.state.entscheidungGetroffen ? <Liederkarte lied={this.state.lied2.track} id={2} auswahl={this.liedAuswählen}/> : null}
-              {/* Siegerkarte (wenn vorbei) */}
-              {this.state.entscheidungGetroffen  ? <Siegerkarte lied={this.state.sieger[0].track} reset={this.reset}/> : null}
-            </div>         
-            
+            : <div>
+                {!this.state.entscheidungGetroffen  ? <h3 className="runde" >Runde {this.state.runde} - {this.state.anzahlLiederInRunde} Lieder</h3> : null }
+                <div className="row justify-content-center">
+                  {/* Card mit Lied 1 */}
+                  {!this.state.entscheidungGetroffen ? <Liederkarte lied={this.state.lied1.track} id={1} auswahl={this.liedAuswählen}/> : null}
+                  {/* Card mit Lied 2 */}
+                  {!this.state.entscheidungGetroffen ? <Liederkarte lied={this.state.lied2.track} id={2} auswahl={this.liedAuswählen}/> : null}
+                  {/* Siegerkarte (wenn vorbei) */}
+                  {this.state.entscheidungGetroffen  ? <Siegerkarte lied={this.state.sieger[0].track} reset={this.reset}/> : null}
+                </div>
+                <div className="row">
+                  {/* Siegerliste (wenn noch mehrere) */}
+                  {!this.state.entscheidungGetroffen  ? <Siegerliste sieger={this.state.sieger} /> : null}
+                </div>
+              </div>   
           }
 
           {/* Cardcontainer */}

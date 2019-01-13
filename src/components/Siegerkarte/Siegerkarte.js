@@ -4,7 +4,7 @@ import "./Siegerkarte.css"
 class Siegerkarte extends React.Component  {
   render() {
     return (
-      <div className="col-sm-6">
+      <div className="Siegerkarte col-sm-12">
         <div className="thumbnail">
           <img src={this.props.lied.album.images[1].url} alt="Albumcover des aktuellen Lieds"/>
           <div className="caption">
